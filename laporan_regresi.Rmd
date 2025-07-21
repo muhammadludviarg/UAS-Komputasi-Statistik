@@ -1,0 +1,46 @@
+---
+title: "Laporan Analisis Regresi Linear Berganda"
+output: pdf_document
+params:
+  dep_var: NULL
+  indep_vars: NULL
+  hasil_regresi: NULL
+  interpretasi_regresi: NULL
+  hasil_asumsi_reg: NULL
+  interpretasi_asumsi_reg: NULL
+  plot_asumsi_reg: NULL
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+***Laporan Analisis Regresi***
+Tanggal Dibuat: `r format(Sys.Date(), '%d %B %Y')`
+
+**1.Hasil Model Regresi**
+*Variabel Dependen (Y) :* `r params$dep_var`
+*Variabel Inependen (X) :* `r paste(params$indep_vars, collapse = ", ")`
+```{r}
+if (!is.null(params$hasil_regresi)) {
+  cat("### Ringkasan Model\n\n```\n")
+  cat(params$hasil_regresi)
+  cat("\n```\n\n")
+  cat("**Interpretasi Model:** \n\n", params$interpretasi_regresi)
+}
+```
+
+**2. Uji Asumsi Regresi**
+```{r}
+if (!is.null(params$hasil_asumsi_reg)) {
+  cat("### Hasil Uji Diagnostik\n\n```\n")
+  cat(params$hasil_asumsi_reg)
+  cat("\n```\n\n")
+  cat("**Interpretasi Asumsi:** \n\n", params$interpretasi_asumsi_reg)
+}
+```
+```{r}
+if (!is.null(params$plot_asumsi_reg)) {
+  par(mfrow = c(2, 2)); plot(params$plot_asumsi_reg)
+}
+```
+

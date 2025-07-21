@@ -1,0 +1,34 @@
+---
+title: "Laporan Uji Proporsi dan Varians"
+output: pdf_document
+params:
+  hasil_prop: NULL
+  interp_prop: NULL
+  hasil_var: NULL
+  interp_var: NULL
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+***Laporan Uji proporsi dan Varians***
+Tanggal Dibuat: `r format(Sys.Date(), '%d %B %Y')`
+```{r}
+if (!is.null(params$hasil_prop)) {
+  cat("## 1. Uji Proporsi\n\n")
+  cat("```{r}\n")
+  cat(params$hasil_prop)
+  cat("\n```\n\n")
+  cat("**Interpretasi:** \n\n", params$interp_prop)
+}
+```
+```{r}
+if (!is.null(params$hasil_var)) {
+  cat("\\newpage\n## 2. Uji Varians\n\n")
+  cat("```{r}\n")
+  cat(params$hasil_var)
+  cat("\n```\n\n")
+  cat("**Interpretasi:** \n\n", params$interp_var)
+}
+```
+

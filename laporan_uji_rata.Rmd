@@ -1,0 +1,34 @@
+---
+title: "Laporan Uji Beda Rata-rata"
+output: pdf_document
+params:
+  hasil_one_sample: NULL
+  interp_one_sample: NULL
+  hasil_two_sample: NULL
+  interp_two_sample: NULL
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+***Laporan Uji Beda Rata-Rata***
+Tanggal dibuat: `r format(Sys.Date(), '%d %B %Y')`
+```{r}
+if (!is.null(params$hasil_one_sample)) {
+  cat("## 1. Uji Rata-rata Satu Sampel\n\n")
+  cat("```{r}\n")
+  cat(params$hasil_one_sample)
+  cat("\n```\n\n")
+  cat("**Interpretasi:** \n\n", params$interp_one_sample)
+}
+```
+```{r}
+if (!is.null(params$hasil_two_sample)) {
+  cat("\\newpage\n## 2. Uji Rata-rata Dua Sampel\n\n")
+  cat("```{r}\n")
+  cat(params$hasil_two_sample)
+  cat("\n```\n\n")
+  cat("**Interpretasi:** \n\n", params$interp_two_sample)
+}
+```
+

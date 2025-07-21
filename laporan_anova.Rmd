@@ -1,0 +1,39 @@
+---
+title: "Laporan Analisis Varians (ANOVA)"
+output: pdf_document
+params:
+  hasil_anova_one: NULL
+  interp_anova_one: NULL
+  plot_anova: NULL
+  hasil_anova_two: NULL
+  interp_anova_two: NULL
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(ggplot2)
+```
+***Laporan Analisis Varians (ANOVA)***
+Tanggal Dibuat: `r format(Sys.Date(), '%d %B %Y')`
+```{r}
+if (!is.null(params$hasil_anova_one)) {
+  cat("## 1. ANOVA Satu Arah\n\n")
+  cat("```{r}\n")
+  cat(params$hasil_anova_one)
+  cat("\n```\n\n")
+  cat("**Interpretasi:** \n\n", params$interp_anova_one)
+}
+```
+```{r}
+if (!is.null(params$plot_anova)) { print(params$plot_anova) }
+```
+```{r}
+if (!is.null(params$hasil_anova_two)) {
+  cat("\\newpage\n## 2. ANOVA Dua Arah\n\n")
+  cat("```{r}\n")
+  cat(params$hasil_anova_two)
+  cat("\n```\n\n")
+  cat("**Interpretasi:** \n\n", params$interp_anova_two)
+}
+```
+

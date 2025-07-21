@@ -1,0 +1,77 @@
+---
+title: "Laporan Analisis Eksplorasi Data"
+output: pdf_document
+params:
+  var_pilihan: NULL
+  data_tabel: NULL
+  plot_hist: NULL
+  interpretasi_hist: NULL
+  plot_box: NULL
+  interpretasi_box: NULL
+  plot_density: NULL
+  interpretasi_density: NULL
+  plot_scatter: NULL
+  interpretasi_scatter: NULL
+  plot_bar: NULL
+  interpretasi_bar: NULL
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(ggplot2)
+library(knitr)
+```
+***Laporan Analisis Eksplorasi Data***
+Laporan ini dibuat pada tanggal `r format(Sys.Date(), '%d %B %Y')`.
+
+**1.Variabel dan Statistik Deskriptif**
+*Variabel yang dianalisis:* `r params$var_pilihan`
+
+```{r}
+if (!is.null(params$data_tabel)) {
+  kable(params$data_tabel, caption = paste("Statistik Deskriptif untuk", params$var_pilihan))
+}
+```
+**2.Visualisasi Data**
+```{r}
+if (!is.null(params$plot_hist)) {
+  print(params$plot_hist)
+  cat("\\newline\\textbf{Interpretasi:} \n\n", params$interpretasi_hist)
+}
+```
+```{r}
+if (!is.null(params$plot_box)) {
+  print(params$plot_box)
+  cat("\\newline\\textbf{Interpretasi:} \n\n", params$interpretasi_box)
+}
+```
+```{r}
+if (!is.null(params$plot_density)) {
+  print(params$plot_density)
+  cat("\\newline\\textbf{Interpretasi:} \n\n", params$interpretasi_density)
+}
+```
+```{r}
+if (!is.null(params$plot_density)) {
+  print(params$plot_density)
+  cat("\\newline\\textbf{Interpretasi:}\n\n ", params$interpretasi_density)
+}
+```
+```{r}
+if (!is.null(params$plot_scatter)) {
+  print(params$plot_scatter)
+  cat("\\newline\\textbf{Interpretasi:} \n\n", params$interpretasi_scatter)
+}
+```
+```{r}
+if (!is.null(params$plot_bar)) {
+  print(params$plot_bar)
+  cat("\\newline\\textbf{Interpretasi:}\n\n ", params$interpretasi_bar)
+}
+```
+
+
+
+
+
+
