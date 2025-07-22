@@ -1,6 +1,3 @@
-
-
-# Load required libraries
 library(shiny)
 library(shinydashboard)
 library(DT)
@@ -19,9 +16,8 @@ library(here)
 
 # Load data
 sovi_data <- read_csv(here("Data", "sovi_data.csv"))
-peta_provinsi <- sf::st_read(here("Data", "Kabupaten Indonesia.geojson"))
+peta_provinsi <- readRDS(here("Data", "peta_kabupaten_simplified.rds"))
 
-# TAMBAHKAN BARIS DI BAWAH INI
 # Mengubah kolom kodeprkab dari character menjadi numeric
 peta_provinsi <- peta_provinsi %>%
   mutate(kodeprkab = as.numeric(kodeprkab))
@@ -37,9 +33,9 @@ ui <- dashboardPage(
     sidebarMenu(
       menuItem("Beranda", tabName = "beranda", icon = icon("home")),
       menuItem("Manajemen Data", tabName = "manajemen", icon = icon("database")),
-      menuItem("Eksplorasi Data", tabName = "eksplorasi_utama", icon = icon("chart-bar"), # Beri nama tab induk baru
-               menuSubItem("Analisis Umum", tabName = "eksplorasi", icon = icon("chart-pie")), # Ini adalah tab eksplorasi lama Anda
-               menuSubItem("Pemetaan Spasial", tabName = "pemetaan", icon = icon("map-marked-alt")) # Ini adalah tab pemetaan yang dipindah
+      menuItem("Eksplorasi Data", tabName = "eksplorasi_utama", icon = icon("chart-bar"), 
+               menuSubItem("Analisis Umum", tabName = "eksplorasi", icon = icon("chart-pie")), 
+               menuSubItem("Pemetaan Spasial", tabName = "pemetaan", icon = icon("map-marked-alt")) 
       ),
       menuItem("Uji Asumsi & Normalitas", tabName = "asumsi", icon = icon("check-circle")),
       menuItem("Statistik Inferensia", tabName = "inferensia", icon = icon("calculator"),
@@ -184,11 +180,11 @@ ui <- dashboardPage(
                   selectInput("var_eksplorasi", "Pilih Variabel:", 
                               choices = NULL),
                   checkboxInput("show_outliers", "Tampilkan Outliers", value = TRUE),
-                  hr(), # Garis pemisah
+                  hr(), 
                   h4("Pilih Tipe Grafik Eksplorasi:"),
                   checkboxGroupInput(
                     "plot_types",
-                    label = NULL, # Tidak perlu label di atas checkbox
+                    label = NULL, 
                     choices = c(
                       "Histogram" = "histogram",
                       "Boxplot" = "boxplot",
@@ -213,21 +209,21 @@ ui <- dashboardPage(
               ),
               
               fluidRow(
-                # conditionalPanel yang sudah dimodifikasi untuk histogram
+               
                 conditionalPanel(
                   condition = "input.plot_types.includes('histogram')",
                   box(
                     title = tags$span(
                       "Histogram",
                       downloadButton("download_plot_hist", "PNG", class="btn-xs pull-right")
-                    ),# Anda bisa mengubah judulnya
+                    ),
                     status = "success", 
                     solidHeader = TRUE, 
                     width = 6,
-                    withSpinner(plotlyOutput("histogram")), # Plot tetap di sini
-                    hr(), # Menambahkan garis pemisah
-                    h4("Interpretasi:"), # Menambahkan sub-judul
-                    withSpinner(uiOutput("histogram_interpretation")) # <-- TAMBAHKAN BARIS INI
+                    withSpinner(plotlyOutput("histogram")), 
+                    hr(), 
+                    h4("Interpretasi:"), 
+                    withSpinner(uiOutput("histogram_interpretation")) 
                   )
                 ),
                 
@@ -237,13 +233,13 @@ ui <- dashboardPage(
                     title = tags$span(
                       "Boxplot",
                       downloadButton("download_plot_box", "PNG", class="btn-xs pull-right")
-                    ),# Anda bisa mengubah judulnya
+                    ),
                     status = "success", 
                     solidHeader = TRUE, 
                     width = 6,
                     withSpinner(plotlyOutput("boxplot")),
-                    hr(), # Menambahkan garis pemisah
-                    h4("Interpretasi:"), # Menambahkan sub-judul
+                    hr(), 
+                    h4("Interpretasi:"),
                     withSpinner(uiOutput("boxplot_interpretation")) 
                   )
                 ),
@@ -255,14 +251,14 @@ ui <- dashboardPage(
                       title = tags$span(
                         "Plot kepadatan",
                         downloadButton("download_plot_density", "PNG", class="btn-xs pull-right"),
-                      ),# Anda bisa mengubah judulnya
+                      ),
                       
                       status = "success",
                       solidHeader = TRUE,
                       width = 6,
                       withSpinner(plotlyOutput("density_plot")),
-                      hr(), # Menambahkan garis pemisah
-                      h4("Interpretasi:"), # Menambahkan sub-judul
+                      hr(), 
+                      h4("Interpretasi:"), 
                       withSpinner(uiOutput("density_interpretation")) 
                     )
                   ),
@@ -272,14 +268,14 @@ ui <- dashboardPage(
                       title = tags$span(
                         "Scatter Plot",
                         downloadButton("download_plot_scatter", "PNG", class="btn-xs pull-right"),
-                      ),# Anda bisa mengubah judulnya
+                      ),
                       
                       status = "success",
                       solidHeader = TRUE,
                       width = 6,
                       withSpinner(plotlyOutput("scatter_plot")),
-                      hr(), # Menambahkan garis pemisah
-                      h4("Interpretasi:"), # Menambahkan sub-judul
+                      hr(), 
+                      h4("Interpretasi:"), 
                       withSpinner(uiOutput("scatter_interpretation")) 
                     )
                   )
@@ -292,14 +288,14 @@ ui <- dashboardPage(
                       title = tags$span(
                         "Bar Plot (Frekuensi)",
                         downloadButton("download_plot_bar", "PNG", class="btn-xs pull-right"),
-                      ),# Anda bisa mengubah judulnya
+                      ),
                       
                       status = "success",
                       solidHeader = TRUE,
                       width = 6,
                       withSpinner(plotlyOutput("bar_plot")),
-                      hr(), # Menambahkan garis pemisah
-                      h4("Interpretasi:"), # Menambahkan sub-judul
+                      hr(), 
+                      h4("Interpretasi:"), 
                       withSpinner(uiOutput("bar_plot_interpretation")) 
                     )
                   )
@@ -318,12 +314,11 @@ ui <- dashboardPage(
               )
       ),
       
-      # GANTI SELURUH BLOK tabItem(tabName = "manajemen", ...) ANDA DENGAN INI
+      
       tabItem(tabName = "manajemen",
               h2("Manajemen dan Preprocessing Data"),
               p("Gunakan fitur di bawah ini untuk mengubah variabel numerik menjadi kategorik atau melakukan transformasi data."),
               
-              # --- BAGIAN 1: KATEGORISASI DATA (LOGIKA BARU ANDA) ---
               fluidRow(
                 box(
                   title = "1. Pengaturan Kategorisasi",
@@ -349,13 +344,12 @@ ui <- dashboardPage(
               ),
               
               hr(),
-              
-              # --- BAGIAN 2: TRANSFORMASI DATA (KODE LAMA ANDA, KINI DALAM FLUIDROW) ---
+
               fluidRow(
                 box(
                   title = "Transformasi Data (Penanganan Outlier)",
                   status = "danger", solidHeader = TRUE, width = 12,
-                  collapsible = TRUE, collapsed = FALSE, # Dibuat bisa disembunyikan agar rapi
+                  collapsible = TRUE, collapsed = FALSE,
                   h4("Transformasi untuk Menangani Outlier"),
                   selectInput("var_transformasi", "Pilih Variabel untuk Transformasi:",
                               choices = c("Pilih Variabel..." = "")),
@@ -365,15 +359,14 @@ ui <- dashboardPage(
                                              "1/x (Inverse)" = "inverse", 
                                              "1/x² (Inverse Square)" = "inverse_square")),
                   textInput("nama_var_transformasi", "Nama Variabel Hasil Transformasi:", 
-                            placeholder = "contoh: income_log"),
+                            placeholder = "contoh: income_log (Jangan ada spasi!!!)"),
                   actionButton("transformasi_btn", "Lakukan Transformasi", class = "btn-danger"),
                   hr(),
                   h5("Status Transformasi:"),
                   verbatimTextOutput("status_transformasi")
                 )
               ),
-              
-              # --- BAGIAN 3: PREVIEW DATA (TETAP SAMA) ---
+
               fluidRow(
                 box(
                   title = "Preview Data Hasil Preprocessing",
@@ -404,8 +397,7 @@ ui <- dashboardPage(
                     downloadButton("unduh_laporan_asumsi", "Unduh Laporan Uji Asumsi (PDF) 📄", class = "btn-primary")
                 )
               ),
-              
-              # SECTION 1: UJI NORMALITAS
+          
               fluidRow(
                 box(
                   title = "Pengaturan Uji Normalitas", 
@@ -431,9 +423,9 @@ ui <- dashboardPage(
                   conditionalPanel(
                     condition = "input.var_normalitas != '' && input.var_normalitas != null",
                     withSpinner(verbatimTextOutput("hasil_normalitas")),
-                    hr(), # Garis pemisah
-                    h4("Interpretasi Hasil:"), # Sub-judul
-                    withSpinner(uiOutput("interpretasi_normalitas")) # <-- TAMBAHKAN INI
+                    hr(), 
+                    h4("Interpretasi Hasil:"), 
+                    withSpinner(uiOutput("interpretasi_normalitas")) 
                   )
                 )
               ),
@@ -460,8 +452,7 @@ ui <- dashboardPage(
                   )
                 )
               ),
-              
-              # SECTION 2: UJI HOMOGENITAS (TERPISAH)
+            
               fluidRow(
                 box(
                   title = "Pengaturan Uji Homogenitas", 
@@ -489,9 +480,9 @@ ui <- dashboardPage(
                   conditionalPanel(
                     condition = "input.var_homogenitas != '' && input.group_var != '' && input.var_homogenitas != null && input.group_var != null",
                     withSpinner(verbatimTextOutput("hasil_homogenitas")),
-                    hr(), # Garis pemisah
-                    h4("Interpretasi Hasil:"), # Sub-judul
-                    withSpinner(uiOutput("interpretasi_homogenitas")) # <-- TAMBAHKAN INI
+                    hr(),
+                    h4("Interpretasi Hasil:"),
+                    withSpinner(uiOutput("interpretasi_homogenitas"))
                   )
                 )
               )
@@ -653,8 +644,7 @@ ui <- dashboardPage(
                     hr(),
                     h4("Interpretasi:"),
                     withSpinner(uiOutput("anova_one_interp")),
-                    downloadButton("download_plot_anova", "PNG", class="btn-xs pull-right"),# <-- TAMBAHKAN INI
-                    withSpinner(plotOutput("anova_plot"))
+                    downloadButton("download_plot_anova", "PNG", class="btn-xs pull-right"),
                   )
                 ),
                 
@@ -704,6 +694,7 @@ ui <- dashboardPage(
                   h4("Uji Asumsi Regresi"),
                   actionButton("uji_asumsi_reg", "Uji Asumsi Regresi", class = "btn-warning"),
                   hr(),
+                  h6("Jalankan Uji Regressi dahulu untuk mengunduh laporan"),
                   downloadButton("unduh_laporan_regresi", "Unduh Laporan Lengkap (PDF) 📝", class="btn-success")
                 ),
                 
@@ -747,8 +738,8 @@ ui <- dashboardPage(
                     condition = "output.regression_summary",
                     withSpinner(plotOutput("assumption_plots")),
                     withSpinner(verbatimTextOutput("assumption_tests")),
-                    hr(), # Garis pemisah
-                    h4("Interpretasi Asumsi:"), # Sub-judul
+                    hr(), 
+                    h4("Interpretasi Asumsi:"),
                     withSpinner(uiOutput("interpretation_assumption_tests"))
                   )
                 )
@@ -764,9 +755,8 @@ ui <- dashboardPage(
                   solidHeader = TRUE,
                   width = 3,
                   
-                  # Input untuk memilih variabel yang akan dipetakan
                   selectInput("var_map", "Pilih Variabel untuk Dipetakan:",
-                              choices = NULL), # Akan diisi secara dinamis oleh server
+                              choices = NULL), 
                   selectInput("pilih_provinsi", "Filter Berdasarkan Provinsi:",
                               choices = pilihan_provinsi),
                   
@@ -791,10 +781,9 @@ ui <- dashboardPage(
   )
 )
 
-# Server - COMPLETE WITH ALL MISSING FUNCTIONS
+# Server 
 server <- function(input, output, session) {
   
-  # Reactive values
   values <- reactiveValues(
     processed_data = sovi_data,
     original_data = sovi_data,
@@ -810,8 +799,8 @@ server <- function(input, output, session) {
   anova_one_result_val <- reactiveVal(NULL)
   anova_two_result_val <- reactiveVal(NULL)
   reg_assumption_results <- reactiveVal(NULL)
+  categorization_details <- reactiveVal(NULL)
   
-  # Update choices when processed data changes
   observe({
     numeric_vars <- names(select_if(values$processed_data, is.numeric))
     all_vars <- names(values$processed_data)
@@ -856,7 +845,7 @@ server <- function(input, output, session) {
                              choices = numeric_vars)
   })
   
-  # Tab Beranda - Value Boxes
+  # Tab Beranda 
   output$total_obs <- renderValueBox({
     valueBox(
       value = nrow(values$processed_data),
@@ -889,12 +878,9 @@ server <- function(input, output, session) {
     req(input$var_eksplorasi)
     var_data <- values$processed_data[[input$var_eksplorasi]]
     
-    # Return NULL jika variabel belum dipilih atau tidak valid agar tidak error
     if (is.null(var_data) || input$var_eksplorasi == "") return(NULL)
-    
-    # Cek apakah variabel numerik
+  
     if(is.numeric(var_data)) {
-      # Buat data frame kustom untuk statistik deskriptif
       stats <- data.frame(
         Statistik = c("Jumlah Observasi (N)", 
                       "Rata-rata (Mean)", 
@@ -914,17 +900,14 @@ server <- function(input, output, session) {
                   max(var_data, na.rm = TRUE)
         )
       )
-      # Bulatkan nilai agar rapi
       stats$Nilai <- round(stats$Nilai, 4)
       return(stats)
       
     } else {
-      # Untuk data kategorik, buat tabel frekuensi yang rapi
       freq_table <- as.data.frame(table(var_data, useNA = "ifany"))
       colnames(freq_table) <- c("Kategori", "Frekuensi")
       return(freq_table)
     }
-    # Opsi tambahan untuk membuat tabel lebih menarik
   }, striped = TRUE, hover = TRUE, bordered = TRUE, align = 'lc')
   
   plot_hist_reactive <- reactive({
@@ -935,7 +918,6 @@ server <- function(input, output, session) {
   })
   
   
-  # 1. Interpretasi untuk Histogram [FIXED]
   output$histogram_interpretation <- renderUI({
     req(input$var_eksplorasi)
     var_data <- values$processed_data[[input$var_eksplorasi]]
@@ -950,7 +932,6 @@ server <- function(input, output, session) {
     sd_val <- sd(var_data)
     skewness <- 3 * (mean_val - median_val) / sd_val
     
-    # PERBAIKAN: Jangan gunakan paste0(). Langsung return tags$p()
     if (abs(skewness) < 0.5) {
       tags$p("Distribusi terlihat ", tags$b("hampir simetris"), ". Nilai rata-rata (", round(mean_val, 2), ") dan median (", round(median_val, 2), ") memiliki nilai yang hampir sama.")
     } else if (skewness > 0.5) {
@@ -966,9 +947,7 @@ server <- function(input, output, session) {
       geom_boxplot(fill = "lightblue", alpha = 0.8) + theme_minimal() + 
       labs(title = paste("Boxplot:", input$var_eksplorasi))
   })
-  
-  
-  # 2. Interpretasi untuk Boxplot [FIXED]
+ 
   output$boxplot_interpretation <- renderUI({
     req(input$var_eksplorasi)
     var_data <- values$processed_data[[input$var_eksplorasi]]
@@ -985,8 +964,7 @@ server <- function(input, output, session) {
     lower_bound <- q1 - 1.5 * iqr
     upper_bound <- q3 + 1.5 * iqr
     outliers <- var_data[var_data < lower_bound | var_data > upper_bound]
-    
-    # PERBAIKAN: Gunakan tagList untuk menggabungkan teks dan tag
+
     outlier_text <- if (length(outliers) == 0) {
       "Berdasarkan metode IQR, tidak terdeteksi adanya outlier yang signifikan."
     } else {
@@ -995,7 +973,7 @@ server <- function(input, output, session) {
     
     tagList(
       tags$ul(
-        # PERBAIKAN: Jangan gunakan paste0() di sini
+       
         tags$li("Garis tengah di dalam kotak (median) berada pada nilai ", tags$b(round(median_val, 2)), ". Ini adalah nilai tengah dari data."),
         tags$li("50% dari data berada di dalam kotak (rentang interkuartil), yaitu antara ", tags$b(round(q1, 2)), " (Kuartil 1) dan ", tags$b(round(q3, 2)), " (Kuartil 3)."),
         tags$li(outlier_text)
@@ -1003,15 +981,14 @@ server <- function(input, output, session) {
     )
   })
   
-  # Plot Kepadatan (Density Plot)
+
   plot_density_reactive <- reactive({
     req(input$var_eksplorasi, is.numeric(values$processed_data[[input$var_eksplorasi]]))
     ggplot(values$processed_data, aes_string(x = input$var_eksplorasi)) +
       geom_density(fill = "salmon", alpha = 0.7) + theme_minimal() +
       labs(title = paste("Plot Kepadatan:", input$var_eksplorasi))
   })
-  
-  # 3. Interpretasi untuk Density Plot [FINAL]
+
   output$density_interpretation <- renderUI({
     req(input$var_eksplorasi)
     var_data <- values$processed_data[[input$var_eksplorasi]]
@@ -1022,7 +999,7 @@ server <- function(input, output, session) {
     density_info <- density(na.omit(var_data))
     peak_val <- density_info$x[which.max(density_info$y)]
     
-    # Kode ini sudah benar karena tidak menggunakan paste0()
+ 
     tags$p(
       "Plot kepadatan ini menunjukkan di mana konsentrasi nilai tertinggi berada. Puncak kurva (modus) mengindikasikan nilai yang paling sering muncul, yaitu di sekitar ",
       tags$b(round(peak_val, 2)), "."
@@ -1039,7 +1016,7 @@ server <- function(input, output, session) {
       labs(title = paste("Scatter Plot:", input$var_eksplorasi), x = "Indeks Observasi")
   })
   
-  # 4. Interpretasi untuk Scatter Plot [FINAL]
+ 
   output$scatter_interpretation <- renderUI({
     req(input$var_eksplorasi)
     var_data <- values$processed_data[[input$var_eksplorasi]]
@@ -1063,12 +1040,11 @@ server <- function(input, output, session) {
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
   })
   
-  # 5. Interpretasi untuk Bar Plot [FINAL]
+  # 5. Interpretasi untuk Bar Plot 
   output$bar_plot_interpretation <- renderUI({
     req(input$var_eksplorasi)
     var_data <- values$processed_data[[input$var_eksplorasi]]
-    
-    # Cek jika variabel numerik dengan terlalu banyak nilai unik
+  
     if (is.numeric(var_data) && length(unique(na.omit(var_data))) >= 20) {
       return(tags$p("Bar plot tidak direkomendasikan untuk variabel numerik dengan banyak nilai unik."))
     }
@@ -1081,7 +1057,7 @@ server <- function(input, output, session) {
     
     most_frequent_cat <- names(freq_table)[1]
     
-    # Kode ini sudah benar karena tidak menggunakan paste0()
+ 
     tags$p(
       "Plot ini menunjukkan frekuensi (jumlah kemunculan) dari setiap kategori. Kategori yang paling sering muncul adalah ",
       tags$b(most_frequent_cat), " dengan total ", tags$b(freq_table[1]), " observasi."
@@ -1092,7 +1068,7 @@ server <- function(input, output, session) {
     DT::datatable(values$processed_data, options = list(scrollX = TRUE, pageLength = 10))
   })
   
-  # Preview Data yang mengikuti pilihan entries
+ 
   output$preview_data <- DT::renderDataTable({
     data_to_show <- values$processed_data
     
@@ -1114,19 +1090,15 @@ server <- function(input, output, session) {
   })
   
   
-  # TAMBAHKAN SEMUA BLOK KODE INI KE DALAM FUNGSI SERVER ANDA
-  
   # --- LOGIKA BARU UNTUK KATEGORISASI MANUAL ---
   
-  # 1. Pesan status
   message_reactive_manual <- reactiveVal()
-  
-  # 2. Perbarui pilihan variabel saat data berubah (hanya untuk yang relevan)
+ 
   observe({
     req(values$processed_data)
     numeric_vars <- names(select_if(values$processed_data, is.numeric))
     
-    # Simpan pilihan saat ini agar tidak ter-reset
+  
     selected_var_cut <- isolate(input$var_to_cut)
     selected_var_transform <- isolate(input$var_transformasi)
     
@@ -1135,66 +1107,75 @@ server <- function(input, output, session) {
   })
   
   
-  # 3. Buat UI dinamis untuk input batas dan nama
   output$manual_interval_inputs <- renderUI({
-    req(input$num_bins_manual)
+    req(input$num_bins_manual, input$var_to_cut) 
     num_categories <- as.integer(input$num_bins_manual)
     req(num_categories >= 2)
     
-    # Kita butuh (jumlah kategori + 1) input untuk batas
     num_breaks <- num_categories + 1
-    
-    # Ambil ringkasan statistik untuk nilai default yang lebih baik
+   
     var_data <- values$processed_data[[input$var_to_cut]]
-    defaults <- if(!is.null(var_data) && is.numeric(var_data)) {
-      round(quantile(var_data, probs = seq(0, 1, length.out = num_breaks), na.rm = TRUE), 2)
+    data_summary <- if(!is.null(var_data) && is.numeric(var_data)) {
+      summary_vals <- summary(na.omit(var_data))
+      paste0("Info Variabel '", input$var_to_cut, "': Min = ", round(summary_vals[[1]], 2), 
+             ", Median = ", round(summary_vals[[3]], 2),
+             ", Max = ", round(summary_vals[[6]], 2))
     } else {
-      rep(0, num_breaks)
+      "Pilih variabel numerik untuk melihat info rentang data."
     }
-    
-    # Buat input untuk batas interval
+  
     boundary_inputs <- lapply(1:num_breaks, function(i) {
-      label <- if (i == 1) "Batas Bawah (Awal)" else if (i == num_breaks) "Batas Atas (Akhir)" else paste("Batas Antara", i-1)
-      numericInput(paste0("manual_break_", i), label, value = defaults[i])
+      label <- if (i == 1) "Batas Paling Awal (misal: 0)" else paste("Batas ke-", i)
+      numericInput(paste0("manual_break_", i), label, value = NA) 
     })
-    
-    # Buat input untuk nama kategori
+ 
     label_inputs <- lapply(1:num_categories, function(i) {
-      textInput(paste0("manual_label_", i), paste("Nama Kategori", i), value = paste0("Kategori ", i))
+      textInput(paste0("manual_label_", i), paste("Nama Kategori", i), value = paste0("Kelompok ", i))
     })
     
-    fluidRow(
-      column(6, h5(tags$b("Definisikan Batas-Batas Interval:")), boundary_inputs),
-      column(6, h5(tags$b("Definisikan Nama Kategori:")), label_inputs)
+    tagList(
+      div(class = "category-section",
+          p(tags$i(data_summary)),
+          p(tags$b("Instruksi:"), "Masukkan semua batas interval secara manual, dari nilai terkecil hingga terbesar. Anda bebas menentukan nilai di luar rentang data (misal: 0 atau 1000) untuk membuat kategori yang sesuai.")
+      ),
+      fluidRow(
+        column(6, 
+               div(class = "boundary-section",
+                   h5(tags$b("Definisikan Batas-Batas Interval")), 
+                   boundary_inputs
+               )
+        ),
+        column(6, 
+               div(class = "category-section",
+                   h5(tags$b("Definisikan Nama Kategori")), 
+                   label_inputs
+               )
+        )
+      )
     )
   })
-  
-  # 4. Logika utama saat tombol ditekan
+ 
   observeEvent(input$cut_data_manual, {
     req(input$var_to_cut, input$num_bins_manual)
     
     var_name <- input$var_to_cut
     num_categories <- as.integer(input$num_bins_manual)
     
-    # Ambil semua batas dari UI
     user_breaks <- sapply(1:(num_categories + 1), function(i) input[[paste0("manual_break_", i)]])
-    
-    # Ambil semua nama kategori dari UI
     user_labels <- sapply(1:num_categories, function(i) {
       label <- input[[paste0("manual_label_", i)]]
       if (is.null(label) || label == "") paste0("Kategori ", i) else label
     })
-    
-    # Validasi
-    if (any(is.null(user_breaks)) || any(is.na(user_breaks)) || is.unsorted(user_breaks)) {
-      message_reactive_manual("Kesalahan: Semua batas interval harus diisi dan diurutkan dari terkecil ke terbesar.")
+ 
+    if (any(is.null(user_breaks)) || any(is.na(user_breaks)) || is.unsorted(user_breaks, na.rm = TRUE)) {
+      showNotification("Error: Semua batas interval harus diisi dan diurutkan dari terkecil ke terbesar.", type = "error")
+      categorization_details(NULL) 
       return()
     }
     
     current_data <- values$processed_data
     cut_var_name <- paste0("Kategori_", var_name)
-    
-    # Proses 'cut' dengan batas yang ditentukan pengguna
+  
     cut_result <- cut(
       current_data[[var_name]],
       breaks = user_breaks,
@@ -1205,43 +1186,43 @@ server <- function(input, output, session) {
     
     current_data[[cut_var_name]] <- cut_result
     values$processed_data <- current_data
+   
+    categorization_details(list(
+      var_name = var_name,
+      new_var_name = cut_var_name,
+      breaks = user_breaks,
+      labels = user_labels
+    ))
     
-    message_reactive_manual("Kategorisasi berhasil!")
+    showNotification("Kategorisasi berhasil!", type = "message")
   })
-  
-  
-  # 5. Tampilkan interpretasi hasil
+
   output$interpretation_cut_manual <- renderUI({
-    req(message_reactive_manual())
-    
-    if (message_reactive_manual() != "Kategorisasi berhasil!") {
-      return(tags$p(message_reactive_manual(), style = "color: red; font-weight: bold;"))
-    }
-    
-    var_name <- input$var_to_cut
-    num_categories <- as.integer(input$num_bins_manual)
-    user_breaks <- sapply(1:(num_categories + 1), function(i) input[[paste0("manual_break_", i)]])
-    user_labels <- sapply(1:num_categories, function(i) input[[paste0("manual_label_", i)]])
-    
+    req(categorization_details()) 
+    details <- categorization_details()
+    num_categories <- length(details$labels)
     range_list <- lapply(1:num_categories, function(i) {
-      lower_bound <- round(user_breaks[i], 2)
-      upper_bound <- round(user_breaks[i + 1], 2)
-      interval_str <- if (i == 1) paste0("[", lower_bound, ", ", upper_bound, "]") else paste0("(", lower_bound, ", ", upper_bound, "]")
-      tags$li(tags$b(user_labels[i]), ": ", interval_str)
+      lower_bound <- round(details$breaks[i], 2)
+      upper_bound <- round(details$breaks[i + 1], 2)
+      
+      interval_str <- if (i == 1) {
+        paste0("[", lower_bound, ", ", upper_bound, "]")
+      } else {
+        paste0("(", lower_bound, ", ", upper_bound, "]")
+      }
+      
+      tags$li(tags$b(details$labels[i]), ": mencakup nilai dalam rentang ", tags$code(interval_str))
     })
-    
+
     tagList(
-      h4("Interpretasi Proses Kategorisasi"),
-      p("Variabel ", tags$strong(var_name), " telah berhasil dibagi menjadi ", num_categories, " kelompok."),
-      p("Kolom baru ", tags$strong(paste0("Kategori_", var_name)), " telah ditambahkan ke data."),
-      p("Rincian kategori berdasarkan batas yang Anda masukkan:"),
+      h4("Interpretasi Proses Kategorisasi Berhasil"),
+      p("Variabel ", tags$strong(details$var_name), " telah berhasil dibagi menjadi ", tags$strong(num_categories), " kelompok."),
+      p("Kolom baru bernama ", tags$strong(details$new_var_name), " telah ditambahkan ke dalam dataset."),
+      p("Rincian kategori:"),
       tags$ul(range_list)
     )
   })
-  
-  
-  
-  # Transformasi data
+ 
   observeEvent(input$transformasi_btn, {
     req(input$var_transformasi, input$jenis_transformasi, input$nama_var_transformasi)
     
@@ -1291,18 +1272,13 @@ server <- function(input, output, session) {
       showNotification(paste("Error dalam transformasi:", e$message), type = "error")
     })
   })
-  
-  # --- Logika untuk Tombol Unduh Peta ---
+ 
   output$download_peta <- downloadHandler(
     filename = function() {
       paste0("peta_sebaran_", input$var_map, "_", Sys.Date(), ".png")
     },
     content = function(file) {
-      # Ambil data reaktif yang sama dengan yang digunakan peta
       data_peta <- data_peta_reaktif()
-      
-      # Buat ulang peta statis untuk di-screenshot (tanpa interaksi hover)
-      # Ini memastikan legenda dan warna tetap ada di file gambar
       pal <- colorNumeric(
         palette = "YlOrRd",
         domain = data_peta[[input$var_map]],
@@ -1327,22 +1303,18 @@ server <- function(input, output, session) {
           title = input$var_map,
           position = "bottomright"
         )
-      
-      # Simpan widget peta sebagai file HTML sementara
       htmlwidgets::saveWidget(peta_statis, "temp_peta.html", selfcontained = FALSE)
-      
-      # Gunakan webshot2 untuk mengambil screenshot dari file HTML
       webshot2::webshot(
         url = "temp_peta.html",
         file = file,
-        vwidth = 1200, # Lebar gambar
-        vheight = 900, # Tinggi gambar
-        delay = 2 # Beri waktu 2 detik untuk peta me-render sebelum screenshot
+        vwidth = 1200, 
+        vheight = 900, 
+        delay = 2 
       )
     }
   )
   
-  # Download processed data
+  
   output$download_data <- downloadHandler(
     filename = function() {
       paste("processed_data_", Sys.Date(), ".csv", sep = "")
@@ -1364,7 +1336,7 @@ server <- function(input, output, session) {
     var_data <- values$processed_data[[input$var_normalitas]]
     var_data <- na.omit(var_data)
     
-    # Lakukan tes dan simpan hasilnya
+   
     if(is.numeric(var_data) && length(var_data) > 3) {
       shapiro_res <- if(length(var_data) <= 5000) shapiro.test(var_data) else NULL
       ks_res <- ks.test(var_data, "pnorm", mean(var_data), sd(var_data))
@@ -1374,9 +1346,8 @@ server <- function(input, output, session) {
     }
     
     output$hasil_normalitas <- renderPrint({
-      # Bagian ini tetap sama seperti sebelumnya, hanya menampilkan output mentah
+    
       cat("UJI NORMALITAS\n")
-      # ... (kode renderPrint Anda yang sudah ada bisa diletakkan di sini atau gunakan yang di bawah)
       results <- norm_test_results()
       if(!is.null(results)) {
         if(!is.null(results$shapiro)){
@@ -1399,13 +1370,13 @@ server <- function(input, output, session) {
       labs(title = paste("Q-Q Plot:", input$var_normalitas)) + theme_minimal()
   })
   
-  # Interpretasi Uji Normalitas
+ 
   output$interpretasi_normalitas <- renderUI({
     req(norm_test_results())
     results <- norm_test_results()
     alpha <- 0.05
     
-    # Interpretasi Shapiro-Wilk
+  
     shapiro_interp <- if(!is.null(results$shapiro)) {
       p_val <- results$shapiro$p.value
       kesimpulan <- if (p_val > alpha) {
@@ -1415,8 +1386,7 @@ server <- function(input, output, session) {
       }
       tags$li("Uji Shapiro-Wilk: Dengan p-value sebesar ", tags$b(round(p_val, 4)), ", dapat disimpulkan bahwa ", kesimpulan)
     }
-    
-    # Interpretasi Kolmogorov-Smirnov
+   
     ks_p_val <- results$ks$p.value
     ks_kesimpulan <- if (ks_p_val > alpha) {
       tagList("data terdistribusi ", tags$b("NORMAL"), ".")
@@ -1440,18 +1410,28 @@ server <- function(input, output, session) {
     var_data <- values$processed_data[[input$var_homogenitas]]
     group_data <- values$processed_data[[input$group_var]]
     
+   
     complete_cases <- complete.cases(var_data, group_data)
     var_data <- var_data[complete_cases]
     group_data <- as.factor(group_data[complete_cases])
     
-    # Lakukan tes dan simpan hasilnya
-    if(is.numeric(var_data) && length(levels(group_data)) >= 2) {
-      bartlett_res <- bartlett.test(var_data ~ group_data)
-      fligner_res <- fligner.test(var_data ~ group_data)
-      homog_test_results(list(bartlett = bartlett_res, fligner = fligner_res))
-    } else {
-      homog_test_results(NULL)
+   
+    group_data <- droplevels(group_data)
+    
+   
+    if (length(levels(group_data)) < 2) {
+      showNotification("Error: Variabel grup harus memiliki minimal 2 kelompok data.", type = "error")
+      return() 
     }
+  
+    if (any(table(group_data) < 2)) {
+      showNotification("Error: Setiap kelompok harus memiliki minimal 2 observasi.", type = "error")
+      return() 
+    }
+  
+    bartlett_res <- bartlett.test(var_data ~ group_data)
+    fligner_res <- fligner.test(var_data ~ group_data)
+    homog_test_results(list(bartlett = bartlett_res, fligner = fligner_res))
     
     output$hasil_homogenitas <- renderPrint({
       results <- homog_test_results()
@@ -1465,14 +1445,13 @@ server <- function(input, output, session) {
       }
     })
   })
-  
-  # Interpretasi Uji Homogenitas
+ 
   output$interpretasi_homogenitas <- renderUI({
     req(homog_test_results())
     results <- homog_test_results()
     alpha <- 0.05
     
-    # Interpretasi Bartlett
+  
     p_val_bartlett <- results$bartlett$p.value
     kesimpulan_bartlett <- if(p_val_bartlett > alpha) {
       tagList("varians antar kelompok bersifat ", tags$b("HOMOGEN"), " (sama).")
@@ -1480,7 +1459,7 @@ server <- function(input, output, session) {
       tagList("varians antar kelompok bersifat ", tags$b("HETEROGEN"), " (berbeda).")
     }
     
-    # Interpretasi Fligner-Killeen
+ 
     p_val_fligner <- results$fligner$p.value
     kesimpulan_fligner <- if(p_val_fligner > alpha) {
       tagList("varians antar kelompok bersifat ", tags$b("HOMOGEN"), " (sama).")
@@ -1663,10 +1642,27 @@ server <- function(input, output, session) {
   })
   
   output$anova_one_interp <- renderUI({
+   
     req(anova_one_result_val())
-    p_val <- anova_one_result_val()[[1]][["Pr(>F)"]][1]
-    kesimpulan <- if(p_val < 0.05) "terdapat perbedaan rata-rata yang signifikan" else "tidak ada perbedaan rata-rata yang signifikan"
-    tags$p("Hasil ANOVA menunjukkan bahwa ", tags$b(kesimpulan), " pada variabel ", tags$b(input$var_anova_dep), " di antara kelompok-kelompok ", tags$b(input$var_anova_indep), " (p-value = ", round(p_val, 4), ").")
+
+    summary_aov <- anova_one_result_val()
+  
+    p_val <- summary_aov[[1]][["Pr(>F)"]][1]
+    
+    req(p_val)
+    
+    kesimpulan <- if (p_val < 0.05) {
+      "terdapat perbedaan rata-rata yang signifikan"
+    } else {
+      "tidak ada perbedaan rata-rata yang signifikan"
+    }
+    
+    tags$p(
+      "Hasil ANOVA menunjukkan bahwa ", tags$b(kesimpulan),
+      " pada variabel ", tags$b(isolate(input$var_anova_dep)),
+      " di antara kelompok-kelompok ", tags$b(isolate(input$var_anova_indep)),
+      " (p-value = ", round(p_val, 4), ")."
+    )
   })
   
   # ANOVA DUA ARAH
@@ -1707,25 +1703,22 @@ server <- function(input, output, session) {
     tagList(tags$ul(li_f1, li_f2, li_int))
   })
   
-  # --- Logika untuk Zoom Peta Otomatis ---
+
   observeEvent(input$pilih_provinsi, {
-    req(input$pilih_provinsi) # Pastikan input tidak kosong
+    req(input$pilih_provinsi) 
     
     proxy <- leafletProxy("peta_sebaran")
     
     if (input$pilih_provinsi == "Seluruh Indonesia") {
-      # Jika "Seluruh Indonesia" dipilih, kembalikan ke tampilan nasional
+     
       proxy %>% setView(lng = 118, lat = -2, zoom = 5)
     } else {
-      # Jika provinsi spesifik dipilih
-      
-      # 1. Ambil batas wilayah (bounding box) dari provinsi yang dipilih
+   
       batas_wilayah <- peta_provinsi %>%
         filter(nmprov == input$pilih_provinsi) %>%
         st_bbox() %>%
         as.list()
       
-      # 2. Perintahkan peta untuk menyesuaikan tampilannya dengan batas wilayah tersebut
       proxy %>% fitBounds(
         lng1 = batas_wilayah$xmin,
         lat1 = batas_wilayah$ymin,
@@ -1791,24 +1784,22 @@ server <- function(input, output, session) {
     }
     
     output$regression_summary <- renderPrint({
-      # Prepare data
+      
       dep_var <- values$processed_data[[input$var_dependent]]
       indep_vars <- values$processed_data[input$var_independent]
       
-      # Create regression data frame
       reg_data <- data.frame(
         dependent = dep_var,
         indep_vars
       )
-      
-      # Remove missing values
+   
       reg_data <- reg_data[complete.cases(reg_data), ]
       
       if(nrow(reg_data) > length(input$var_independent) + 1) {
-        # Create formula
+      
         formula_str <- paste("dependent ~", paste(input$var_independent, collapse = " + "))
         
-        # Fit regression model
+     
         reg_model <- lm(as.formula(formula_str), data = reg_data)
         values$regression_model <- reg_model
         
@@ -1818,7 +1809,7 @@ server <- function(input, output, session) {
         cat("Variabel Independen:", paste(input$var_independent, collapse = ", "), "\n")
         cat("Jumlah observasi:", nrow(reg_data), "\n\n")
         
-        # Print summary
+       
         print(summary(reg_model))
         
       } else {
@@ -1871,20 +1862,18 @@ server <- function(input, output, session) {
     })
   })
   
-  # --- Logika untuk Peta Sebaran ---
-  
-  # 1. Buat data reaktif yang menggabungkan data peta dan data sovi
+ 
   data_peta_reaktif <- reactive({
     req(input$var_map)
     
-    # Filter data peta terlebih dahulu jika sebuah provinsi dipilih
+  
     peta_terfilter <- if (!is.null(input$pilih_provinsi) && input$pilih_provinsi != "Seluruh Indonesia") {
       peta_provinsi %>% filter(nmprov == input$pilih_provinsi)
     } else {
       peta_provinsi
     }
     
-    # Lakukan join dengan data yang sudah difilter
+ 
     left_join(
       peta_terfilter,
       values$processed_data,
@@ -1892,7 +1881,7 @@ server <- function(input, output, session) {
     )
   })
   
-  # 2. Render peta leaflet
+
   output$peta_sebaran <- renderLeaflet({
     data_peta <- data_peta_reaktif()
     req(input$var_map, input$var_map %in% names(data_peta))
@@ -1911,23 +1900,23 @@ server <- function(input, output, session) {
       format(data_peta[[input$var_map]], big.mark = ",", decimal.mark = ".", nsmall = 2)
     ) %>% lapply(htmltools::HTML)
     
-    # Membuat peta
-    leaflet(data = data_peta, options = leafletOptions(preferCanvas = TRUE)) %>% # Prefer canvas untuk performa lebih baik
+  
+    leaflet(data = data_peta, options = leafletOptions(preferCanvas = TRUE)) %>% 
       addProviderTiles(providers$CartoDB.Positron) %>%
       setView(lng = 118, lat = -2, zoom = 5) %>%
       addPolygons(
         fillColor = ~pal(get(input$var_map)),
-        weight = 1.5,                      # <-- UBAH: Garis batas sedikit lebih tebal
+        weight = 1.5,                     
         opacity = 1,
-        color = "black",                   # <-- UBAH: Warna garis batas menjadi hitam
+        color = "black",                  
         dashArray = "1",
         fillOpacity = 0.7,
-        highlightOptions = highlightOptions( # <-- MODIFIKASI EFEK HOVER
-          weight = 3,                      # Garis batas saat di-hover
-          color = "#FFFFFF",               # Warna garis batas saat di-hover (putih)
+        highlightOptions = highlightOptions( 
+          weight = 3,                     
+          color = "#FFFFFF",              
           dashArray = "",
-          fillOpacity = 0.9,               # Opacity saat di-hover
-          bringToFront = TRUE              # Bawa ke depan saat di-hover
+          fillOpacity = 0.9,             
+          bringToFront = TRUE             
         ),
         label = labels,
         labelOptions = labelOptions(
@@ -1944,35 +1933,33 @@ server <- function(input, output, session) {
       )
   })
   
-  # UJI ASUMSI REGRESI - [FIXED with INTERPRETATION]
+  # UJI ASUMSI REGRESI 
   observeEvent(input$uji_asumsi_reg, {
     req(values$regression_model)
     
     model <- values$regression_model
     residuals <- residuals(model)
     
-    # Lakukan semua tes dan kumpulkan hasilnya
-    # 1. Normalitas
+   
     shapiro_res <- if(length(residuals) <= 5000) shapiro.test(residuals) else NULL
     
-    # 2. Homoskedastisitas (Breusch-Pagan)
     bp_res <- tryCatch({
       lmtest::bptest(model)
     }, error = function(e) { NULL })
     
-    # 3. Autokorelasi (Durbin-Watson)
+ 
     dw_res <- tryCatch({
       lmtest::dwtest(model)
     }, error = function(e) { NULL })
     
-    # 4. Multikolinearitas (VIF)
+   
     vif_res <- if(length(coef(model)) > 2) {
       tryCatch({
         car::vif(model)
       }, error = function(e) { NULL })
     } else { NULL }
     
-    # Simpan semua hasil ke reactiveVal
+  
     reg_assumption_results(list(
       shapiro = shapiro_res,
       bptest = bp_res,
@@ -2034,7 +2021,6 @@ server <- function(input, output, session) {
     # 4. Interpretasi Multikolinearitas
     interp_vif <- if(!is.null(res$vif)) {
       vif_values <- res$vif
-      # Periksa jika ada VIF yang lebih dari 10 (atau 5)
       is_high_vif <- any(vif_values > 10)
       kesimpulan <- if(is_high_vif) {
         high_vif_vars <- names(vif_values[vif_values > 10])
@@ -2055,7 +2041,7 @@ server <- function(input, output, session) {
     )
   })
   
-  # Di anova_plot ada reactive. jadi kita buatkan juga
+
   plot_anova_reactive <- reactive({
     req(input$var_anova_dep, input$var_anova_indep)
     ggplot(values$processed_data, aes_string(x = input$var_anova_indep, y = input$var_anova_dep, fill = input$var_anova_indep)) +
@@ -2068,29 +2054,24 @@ server <- function(input, output, session) {
     plot_anova_reactive()
   })
   
-  # --- LOGIKA LENGKAP UNTUK UNDUH LAPORAN REGRESI (SUDAH DIPERBAIKI) --- #
   output$unduh_laporan_regresi <- downloadHandler(
     filename = function() {
       paste0("Laporan-Regresi-", input$var_dependent, "-", Sys.Date(), ".pdf")
     },
     content = function(file) {
-      # Pastikan model regresi sudah ada sebelum melanjutkan
       req(values$regression_model, message = "Jalankan model regresi terlebih dahulu.")
       
-      # Tampilkan notifikasi kepada pengguna
+   
       showNotification("Menyiapkan laporan Regresi lengkap...", duration = 15, type = "message")
       
-      # Salin template Rmd ke folder sementara agar tidak mengganggu file asli
+    
       temp_report <- file.path(tempdir(), "laporan_regresi.Rmd")
       file.copy("laporan_regresi.Rmd", temp_report, overwrite = TRUE)
       
-      # Ambil model dan hasil uji asumsi dari reactive values
+
       model <- values$regression_model
       asumsi_res <- reg_assumption_results()
-      
-      #--------------------------------------------------------------------#
-      # BAGIAN 1: BUAT INTERPRETASI MODEL REGRESI (SEBAGAI TEKS BIASA)
-      #--------------------------------------------------------------------#
+    
       interp_reg_text <- NULL
       if (!is.null(model)) {
         summary_model <- summary(model)
@@ -2128,18 +2109,14 @@ server <- function(input, output, session) {
         })
         full_coeff_text <- paste(coeff_text_lines, collapse = "\n")
         
-        # Gabungkan semua interpretasi regresi menjadi satu teks
         interp_reg_text <- paste(
           "1. Signifikansi Model (Uji-F):\n", model_sig_text, "\n\n",
           "2. Kebaikan Model (Goodness of Fit):\n", r_sq_text, "\n\n",
           "3. Interpretasi Koefisien (Uji-t):\n", full_coeff_text
         )
       }
-      
-      #--------------------------------------------------------------------#
-      # BAGIAN 2: BUAT INTERPRETASI UJI ASUMSI (SEBAGAI TEKS BIASA)
-      #--------------------------------------------------------------------#
-      interp_asumsi_text <- "Uji asumsi belum dijalankan." # Default text
+   
+      interp_asumsi_text <- "Uji asumsi belum dijalankan." 
       if(!is.null(asumsi_res)) {
         alpha <- 0.05
         
@@ -2176,10 +2153,7 @@ server <- function(input, output, session) {
         # Gabungkan semua interpretasi asumsi
         interp_asumsi_text <- paste(interp_norm, interp_homosked, interp_auto, interp_vif, sep = "\n")
       }
-      
-      #--------------------------------------------------------------------#
-      # BAGIAN 3: MENYUSUN PARAMETER DAN RENDER LAPORAN
-      #--------------------------------------------------------------------#
+ 
       params_list <- list(
         dep_var = isolate(input$var_dependent),
         indep_vars = isolate(input$var_independent),
@@ -2187,10 +2161,10 @@ server <- function(input, output, session) {
         interpretasi_regresi = interp_reg_text,
         hasil_asumsi_reg = if(!is.null(asumsi_res)) paste(capture.output(asumsi_res), collapse="\n") else NULL,
         interpretasi_asumsi_reg = interp_asumsi_text,
-        plot_asumsi_reg = model # Kirim objek model untuk di-plot di Rmd
+        plot_asumsi_reg = model 
       )
       
-      # Render laporan R Markdown menjadi PDF
+   
       rmarkdown::render(
         temp_report, 
         output_file = file, 
@@ -2200,15 +2174,13 @@ server <- function(input, output, session) {
     }
   )
   
-  # --- LOGIKA UNDUH LAPORAN ANOVA (SUDAH DIPERBAIKI) --- #
   output$unduh_laporan_anova <- downloadHandler(
     filename = function() { paste0("Laporan-ANOVA-", Sys.Date(), ".pdf") },
     content = function(file) {
       showNotification("Menyiapkan laporan ANOVA...", type = "message")
       temp_report <- file.path(tempdir(), "laporan_anova.Rmd")
       file.copy("laporan_anova.Rmd", temp_report, overwrite = TRUE)
-      
-      # Buat interpretasi teks biasa untuk ANOVA Satu Arah
+  
       interp_anova_one_text <- NULL
       if (!is.null(anova_one_result_val())) {
         summary_res <- anova_one_result_val()
@@ -2222,7 +2194,7 @@ server <- function(input, output, session) {
         )
       }
       
-      # Buat interpretasi teks biasa untuk ANOVA Dua Arah
+ 
       interp_anova_two_text <- NULL
       if (!is.null(anova_two_result_val())) {
         summary_res <- anova_two_result_val()[[1]]
@@ -2253,8 +2225,7 @@ server <- function(input, output, session) {
       rmarkdown::render(temp_report, output_file = file, params = params_list, envir = new.env(parent = globalenv()))
     }
   )
-  
-  # --- LOGIKA UNDUH LAPORAN UJI PROPORSI & VARIANS --- #
+ 
   output$unduh_laporan_uji_prop_var <- downloadHandler(
     filename = function() { paste0("Laporan-Uji-Prop-Var-", Sys.Date(), ".pdf") },
     content = function(file) {
@@ -2285,8 +2256,7 @@ server <- function(input, output, session) {
       rmarkdown::render(temp_report, output_file = file, params = params_list, envir = new.env(parent = globalenv()))
     }
   )
-  
-  # --- LOGIKA UNDUH LAPORAN UJI RATA-RATA --- #
+ 
   output$unduh_laporan_uji_rata <- downloadHandler(
     filename = function() { paste0("Laporan-Uji-Rata-", Sys.Date(), ".pdf") },
     content = function(file) {
@@ -2294,11 +2264,11 @@ server <- function(input, output, session) {
       temp_report <- file.path(tempdir(), "laporan_uji_rata.Rmd")
       file.copy("laporan_uji_rata.Rmd", temp_report, overwrite = TRUE)
       
-      # Ambil hasil dari reactiveVal
+    
       one_sample_res <- one_sample_t_result()
       two_sample_res <- two_sample_t_result()
       
-      # Siapkan interpretasi (versi teks)
+   
       interp_one_sample_text <- NULL
       if(!is.null(one_sample_res)){
         p_val <- one_sample_res$p.value
@@ -2323,8 +2293,7 @@ server <- function(input, output, session) {
       rmarkdown::render(temp_report, output_file = file, params = params_list, envir = new.env(parent = globalenv()))
     }
   )
-  
-  # --- LOGIKA UNDUH LAPORAN UJI ASUMSI --- #
+ 
   output$unduh_laporan_asumsi <- downloadHandler(
     filename = function() { paste0("Laporan-Asumsi-", Sys.Date(), ".pdf") },
     content = function(file) {
@@ -2333,11 +2302,10 @@ server <- function(input, output, session) {
       temp_report <- file.path(tempdir(), "laporan_asumsi.Rmd")
       file.copy("laporan_asumsi.Rmd", temp_report, overwrite = TRUE)
       
-      # Ambil hasil dari reactiveVal
+  
       norm_res <- norm_test_results()
       homog_res <- homog_test_results()
-      
-      # Siapkan interpretasi (versi teks)
+    
       interp_norm_text <- NULL
       if(!is.null(norm_res)) {
         p_val_shapiro <- norm_res$shapiro$p.value
@@ -2367,27 +2335,24 @@ server <- function(input, output, session) {
       rmarkdown::render(temp_report, output_file = file, params = params_list, envir = new.env(parent = globalenv()))
     }
   )
-  
-  # --- LOGIKA UNDUH LAPORAN EKSPLORASI DATA (SUDAH DIPERBAIKI) --- #
+
   output$unduh_laporan_eksplorasi <- downloadHandler(
     filename = function() {
       paste0("Laporan-Eksplorasi-", input$var_eksplorasi, "-", Sys.Date(), ".pdf")
     },
     content = function(file) {
       
-      # PERBAIKAN #1: Tambahkan req() untuk memastikan variabel sudah dipilih
-      # Ini akan mencegah error jika tombol diklik sebelum variabel ada.
+ 
       req(input$var_eksplorasi, message = "Silakan pilih variabel terlebih dahulu.")
       
       showNotification("Menyiapkan laporan, mohon tunggu...", duration = 10, type = "message")
       
       temp_report <- file.path(tempdir(), "laporan_eksplorasi.Rmd")
       file.copy("laporan_eksplorasi.Rmd", temp_report, overwrite = TRUE)
-      
-      # --- Menyiapkan Semua Parameter ---
+  
       var_data_report <- values$processed_data[[input$var_eksplorasi]]
       
-      # 1. Tabel Statistik Deskriptif (Logika yang lebih aman)
+  
       tabel_stats <- NULL
       if(is.numeric(var_data_report)) {
         desc <- summary(var_data_report)
@@ -2396,13 +2361,12 @@ server <- function(input, output, session) {
         tabel_stats <- as.data.frame(table(var_data_report))
         colnames(tabel_stats) <- c("Kategori", "Frekuensi")
       }
-      
-      # PERBAIKAN #2: Tulis ulang logika interpretasi di sini (lebih stabil)
+   
       interp_hist_text <- NULL
       interp_box_text <- NULL
       
       if (is.numeric(var_data_report)) {
-        # Logika untuk interpretasi histogram
+ 
         clean_data <- na.omit(var_data_report)
         mean_val <- mean(clean_data)
         median_val <- median(clean_data)
@@ -2417,14 +2381,13 @@ server <- function(input, output, session) {
           interp_hist_text <- "Distribusi menjulur ke kiri (negative skew)."
         }
         
-        # Logika untuk interpretasi boxplot
+  
         q1 <- quantile(clean_data, 0.25)
         q3 <- quantile(clean_data, 0.75)
         interp_box_text <- paste0("Median data berada di ", round(median_val, 2), 
                                   ". 50% data berada di antara ", round(q1, 2), " dan ", round(q3, 2), ".")
       }
-      
-      # --- Membuat List Parameter ---
+     
       params_list <- list(
         var_pilihan = input$var_eksplorasi,
         data_tabel = tabel_stats,
