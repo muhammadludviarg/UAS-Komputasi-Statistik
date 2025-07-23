@@ -13,6 +13,7 @@ library(webshot)
 library(lmtest)
 library(car)
 library(here)
+library(pagedown)
 
 # Load data
 sovi_data <- read_csv(here("Data", "sovi_data.csv"))
